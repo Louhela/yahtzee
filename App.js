@@ -1,11 +1,4 @@
 import React from "react";
-import { View } from "react-native"
-import { Text, Pressable, TextInput, Button } from "react-native";
-
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import styles from "./style/style"
-
 import Gameboard from "./components/Gameboard";
 import Home from "./components/Home";
 import Leaderboard from "./components/Scoreboard";
@@ -13,9 +6,6 @@ import Leaderboard from "./components/Scoreboard";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons"
 import { NavigationContainer } from "@react-navigation/native";
-
-import { useNavigation } from '@react-navigation/native';
-
 
 const Tab = createBottomTabNavigator();
 
@@ -26,7 +16,7 @@ const LEADERBOARD = "Leaderboard";
 const icons = {
   [HOME]: "home",
   [GAME]: "dice-multiple",
-  [LEADERBOARD]: "account-settings"
+  [LEADERBOARD]: "account-star"
 }
 
 function getOptions({route}) {
@@ -38,35 +28,19 @@ function getOptions({route}) {
     tabBarInactiveTintColor: 'black'
 
   }
-  
 }
 
-
 export default function App() {
-  
   return (
-
-    
     <NavigationContainer>
-    
       <Tab.Navigator initialRouteName="Home" screenOptions={getOptions}>
           <Tab.Screen name={HOME} component={Home} 
           options={{tabBarStyle: {display: "none"}}}/>
           <Tab.Screen name={GAME} component={Gameboard}/>
           <Tab.Screen name={LEADERBOARD} component={Leaderboard}/>
       </Tab.Navigator>
-      
     </NavigationContainer>
 
   )
 
 }
-
-// function Home({navigation}) {
-
-// }
-// const navigation = useNavigation(); 
-
-// const HomeScreen = ({navigation}) => <Home />
-// const GameScreen = ({navigation}) => <Gameboard />
-// const LeaderboardScreen = ({navigation}) => <Leaderboard />

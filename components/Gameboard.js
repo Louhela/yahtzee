@@ -1,15 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, Pressable } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons"
 import styles from "../style/style";
-// import * as Constants from "../constants"
 import {NBR_OF_DICES, NBR_OF_THROWS, MIN_SPOT, MAX_SPOT, BONUS_POINTS_LIMIT, BONUS_POINTS, SCOREBOARD_KEY} from "../constants"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "./Header";
 import Footer from "./Footer";
-
-// import { useNavigation } from '@react-navigation/native';
-
 
 let board = [];
 
@@ -25,40 +21,29 @@ export default function Gameboard ({route}) {
 
     }, [])
     
-    // console.log(playerName)
-    // console.log(route.params.pname)
+
     const [gameOver, setGameOver] = useState(false)
     const [allowFreeze, setAllowFreeze] = useState(true);
-
     const [nbrOfThrowsLeft, setNbrOfThrowsLeft] = useState(NBR_OF_THROWS);
     const [totalPoints, setTotalPoints] = useState(0)
     const [status, setStatus] = useState('');
-    //"Frozen dices"
-    const [selectedDices, setSelectedDices] = 
-        useState(new Array(NBR_OF_DICES).fill(false))
-
-    //Dice type that has already been selected
-    const [selectedPoints, setSelectedPoints] = 
-        useState(new Array(6).fill(false))
-
-    // console.log(selectedPoints)
-
-    //Points per selected dice type
-    const [pointsPerdice, setPointsPerdice] = 
-        useState(new Array(6).fill(0))
-
-    // console.log(pointsPerdice)
-
-
-    // Current dices on the table
-    const [dicesOnTable, setDicesOnTable] = 
-        useState(new Array(NBR_OF_DICES).fill(0))
-
     const [scores, setScores] = useState([]);
 
-function handleRestart() {
-    // savePlayerPoints()
+    //"Frozen dices"
+    const [selectedDices, setSelectedDices] = useState(new Array(NBR_OF_DICES).fill(false))
 
+    //Dice type that has already been selected
+    const [selectedPoints, setSelectedPoints] = useState(new Array(6).fill(false))
+
+    //Points per selected dice type
+    const [pointsPerdice, setPointsPerdice] = useState(new Array(6).fill(0))
+
+    // Current dices on the table
+    const [dicesOnTable, setDicesOnTable] = useState(new Array(NBR_OF_DICES).fill(0))
+    
+
+function handleRestart() {
+    getScoreboardData()
     setGameOver(false)
     setAllowFreeze(true)
     setNbrOfThrowsLeft(NBR_OF_THROWS)
@@ -101,45 +86,35 @@ const selectPoints = (i) => {
 
     if (pointSelection[i] == false && nbrOfThrowsLeft == 0) {
         setStatus("Points set for " + faceValue)
-        dicesRightNow = [...dicesOnTable]
-
-
-        countOfSame = dicesRightNow.filter(x => x === faceValue).length
+        countOfSameDices = [...dicesOnTable]
+        countOfSame = countOfSameDices.filter(x => x === faceValue).length
 
         let pointsToAdd = [...pointsPerdice];
         pointsToAdd[i] = ( faceValue ) * countOfSame
-        setPointsPerdice(pointsToAdd);
 
+        setPointsPerdice(pointsToAdd);
         setTotalPoints(totalPoints + faceValue * countOfSame)
 
         pointSelection[i] = true
 
-
         setSelectedPoints(pointSelection)
-
-
         setSelectedDices(new Array(NBR_OF_DICES).fill(false))
-        
         setAllowFreeze(false)
-        console.log(pointSelection)
-        if (pointSelection.every((val, i, arr) => val === arr[0]) && pointSelection[0] == true) {
-            
-            setGameOver(true)
 
+        if (pointSelection.every((val, i, arr) => val === arr[0]) && pointSelection[0] == true) {
+
+            setGameOver(true)
         }
         else{
             setNbrOfThrowsLeft(NBR_OF_THROWS);
-
         }
-
     } 
     else {
         setStatus("Throw 3 times before setting points");
     }
 }
 
-let dicesNow  = [...dicesOnTable]
-
+let tableDices  = [...dicesOnTable]
 const throwDices = () => {
     setAllowFreeze(true)
     if (nbrOfThrowsLeft > 0){
@@ -148,15 +123,14 @@ const throwDices = () => {
             if (!selectedDices[i]){
                 let randomNumber = Math.floor(Math.random() * 6 + 1);
                 board[i] = 'dice-' + randomNumber;
-                dicesNow[i] = randomNumber;
-                
+                tableDices[i] = randomNumber;
             } 
         }
-            
-    setDicesOnTable(dicesNow)
-    setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
 
+    setDicesOnTable(tableDices)
+    setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
     }
+
     else {
         setStatus("Select points before throwing")
     }
@@ -170,7 +144,7 @@ function checkBonusPoints() {
     else {
         setStatus("The game has ended, you didn't get bonus points")
     }
-    // savePlayerPoints()
+    
     savePlayerPoints()
 }
 
@@ -179,24 +153,9 @@ useEffect(() => {
     if (nbrOfThrowsLeft === NBR_OF_THROWS) {
         setStatus("Throw dices");
     }
-    // if (nbrOfThrowsLeft < 0) {
-    //     console.log("oon täsä :DDDDDDDDDDDDDDDDDDDD")
-    //     setNbrOfThrowsLeft(NBR_OF_THROWS-1);
-        
-    // }
 }, [gameOver]);
 
-// useEffect(() => {
-//     if (nbrOfThrowsLeft === 0) {
-//         setStatus('Select your points')
-//     }
-//     else if (nbrOfThrowsLeft < 0){
-//         setNbrOfThrowsLeft(NBR_OF_THROWS - 1)
-//     }
-// }, [nbrOfThrowsLeft])
-
 const row = [];
-
 for (let i = 0; i < NBR_OF_DICES; i++){
     row.push(
         <Pressable
@@ -227,7 +186,6 @@ for (let i = 0; i < 6; i++){
             color={getPointsColor(i)}>
             </MaterialCommunityIcons>
         </Pressable>
-        
     );
 }
 
@@ -245,11 +203,19 @@ const getScoreboardData = async () => {
 }
 
 const savePlayerPoints = async () => {
+    let currentDate = new Date()
+    let date = currentDate.getDate();
+    let month = currentDate.getMonth() + 1;
+    let year = currentDate.getFullYear();
+    let hours = currentDate.getHours();
+    let minutes = currentDate.getMinutes();
+
     const playerPoints = {
         name: playerName,
-        date: '3.3.2023', //replace with  real
-        time: '10:20', //replace with  real
-        points: totalPoints
+        date: date + '.' + month + '.' + year,
+        time: hours + ':' + minutes,
+        points: totalPoints,
+      
     }
     try{
         const newScore = [...scores, playerPoints];
@@ -260,8 +226,6 @@ const savePlayerPoints = async () => {
         console.log("Write error: " +  error.message)
     }
 }
-
-// console.log(scores)
 
 function GameButton() {
     if(gameOver){
@@ -286,34 +250,15 @@ return(
     <View style={styles.gameboard}>
         <Header />
         <View style={styles.flex}>{row}
-        {/* <MaterialCommunityIcons
-            name={"dice-multiple"}
-            size={50}>
-        </MaterialCommunityIcons> */}
         </View>
-
         <Text style={styles.gameinfo}>Throws left: {nbrOfThrowsLeft}</Text>
         <Text style={styles.gameinfo}>{status}</Text>
-
         <View style={styles.flex}>{pointSelector}</View>
-
-        <GameButton />
-        {/* <Pressable style={styles.button}
-            onPress={() => throwDices()}>
-                <Text style={styles.buttonText}>
-                    Throw dices
-                </Text>
-            </Pressable> */}
+            <GameButton />
         <Text>Total Points: {totalPoints}</Text>
         <Text>
             You are {BONUS_POINTS_LIMIT - totalPoints} points away from bonus!
         </Text>
-        {/* <Pressable style={styles.button}
-            onPress={() => handleGameEnd()}>
-                <Text style={styles.buttonText}>
-                    Restart
-                </Text>
-            </Pressable> */}
         <Footer />
     </View>
 )

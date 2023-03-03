@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Text, View, Pressable } from "react-native";
+import { View } from "react-native";
+import { DataTable } from 'react-native-paper';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons"
 import styles from "../style/style";
-// import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Constants from "../constants"
+import {SCOREBOARD_KEY} from "../constants"
 
 
 export default Scoreboard = ( {navigation} ) => {
@@ -21,11 +21,11 @@ export default Scoreboard = ( {navigation} ) => {
 
     const getScoreboardData = async () => {
         try {
-            const jsonValue = await AsyncStorage.getItem(Constants.SCOREBOARD_KEY);
+            const jsonValue = await AsyncStorage.getItem(SCOREBOARD_KEY);
             if(jsonValue !== null){
                 let tmpScores = JSON.parse(jsonValue);
+                tmpScores.sort((a, b) => parseFloat(b.points) - parseFloat(a.points));
                 setScores(tmpScores);
-                // sort here
             }
         }
         catch(error){
@@ -34,13 +34,24 @@ export default Scoreboard = ( {navigation} ) => {
     }
 
     return (
-    <View style={styles.gameboard}>
+    <View>
         <View>
-            
+        <DataTable>
+            <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Date</DataTable.Title>
+            <DataTable.Title >Time</DataTable.Title>
+            <DataTable.Title >Points</DataTable.Title>
+            </DataTable.Header>
             {scores.map((player, i) => (
-                <Text key={i}>{i + 1}. {player.name} {player.date} {player.time} {player.points}</Text>
+                <DataTable.Row key={i}>
+                <DataTable.Cell>{player.name}</DataTable.Cell>
+                <DataTable.Cell>{player.date}</DataTable.Cell>
+                <DataTable.Cell>{player.time}</DataTable.Cell>
+                <DataTable.Cell>{player.points}</DataTable.Cell>
+                </DataTable.Row>
             ))}
-            
+        </DataTable>
         </View>
     </View>
     )

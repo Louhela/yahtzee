@@ -63,5 +63,22 @@ export default StyleSheet.create({
   buttonText: {
     color:"#2B2B52",
     fontSize: 20
+  },
+  rules:{
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  rulesBold: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  rulesText: {
+    textAlign: 'center',
+    fontSize: 15,
+    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 10
   }
 });
