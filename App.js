@@ -8,7 +8,7 @@ import styles from "./style/style"
 
 import Gameboard from "./components/Gameboard";
 import Home from "./components/Home";
-import Leaderboard from "./components/Leaderboard";
+import Leaderboard from "./components/Scoreboard";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons"
@@ -32,10 +32,10 @@ const icons = {
 function getOptions({route}) {
   return {
     tabBarIcon: () => <MaterialCommunityIcons name={icons[route.name]} size={30}/>,
-    tabBarStyle: {backgroundColor: '#f2f2f2', height: 80, paddingBottom: 10},
+    tabBarStyle: {backgroundColor: '#f2f2f2', height: 60, paddingBottom: 10},
     tabBarLabelStyle: {fontWeight: 'bold', fontSize: 15},
-    tabBarActiveTintColor: 'red',
-    tabBarInactiveTintColor: 'white'
+    tabBarActiveTintColor: 'skyblue',
+    tabBarInactiveTintColor: 'black'
 
   }
   
@@ -45,14 +45,19 @@ function getOptions({route}) {
 export default function App() {
   
   return (
+
+    
     <NavigationContainer>
+    
       <Tab.Navigator initialRouteName="Home" screenOptions={getOptions}>
           <Tab.Screen name={HOME} component={Home} 
           options={{tabBarStyle: {display: "none"}}}/>
           <Tab.Screen name={GAME} component={Gameboard}/>
           <Tab.Screen name={LEADERBOARD} component={Leaderboard}/>
       </Tab.Navigator>
+      
     </NavigationContainer>
+
   )
 
 }
