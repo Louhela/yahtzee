@@ -47,7 +47,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Home" screenOptions={getOptions}>
-          <Tab.Screen name={HOME} component={Home}/>
+          <Tab.Screen name={HOME} component={Home} 
+          options={{tabBarStyle: {display: "none"}}}/>
           <Tab.Screen name={GAME} component={Gameboard}/>
           <Tab.Screen name={LEADERBOARD} component={Leaderboard}/>
       </Tab.Navigator>

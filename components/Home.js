@@ -8,12 +8,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 
 export default function Home({ navigation }){
-    // const navigation = useNavigation();
-// const navigation = useNavigation();
-// console.log(navigation)
+
+    
 const [playerName, setplayerName] = useState()
 const [loggedIn, setLoggedIn] = useState(false)
-// const loggedIn = false
+
 
 if (loggedIn){
     return(

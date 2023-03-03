@@ -8,27 +8,28 @@ import * as Constants from "../constants"
 
 
 let board = [];
-const NBR_OF_DICES = 5;
-const NBR_OF_THROWS = 3;
-
-const MIN_SPOT = 1;
-const MAX_SPOT = 6;
-
-const BONUS_POINTS_LIMIT = 63;
-const BONUS_POINTS = 50;
 
 export default function Gameboard ({route}) {
-    console.log(route.params.pname)
-    // const navigation = useNavigation();
+    const [playerName, setPlayerName] = useState("")
+
+    useEffect(() => {
+      if (playerName === "" && route.params?.pname) {
+        setPlayerName(route.params.pname)
+      }
+
+    }, [])
+    
+    // console.log(playerName)
     // console.log(route.params.pname)
+    const [gameOver, setGameOver] = useState(false)
     const [allowFreeze, setAllowFreeze] = useState(true);
 
-    const [nbrOfThrowsLeft, setNbrOfThrowsLeft] = useState(NBR_OF_THROWS);
+    const [nbrOfThrowsLeft, setNbrOfThrowsLeft] = useState(Constants.NBR_OF_THROWS);
     const [totalPoints, setTotalPoints] = useState(0)
     const [status, setStatus] = useState('');
     //"Frozen dices"
     const [selectedDices, setSelectedDices] = 
-        useState(new Array(NBR_OF_DICES).fill(false))
+        useState(new Array(Constants.NBR_OF_DICES).fill(false))
 
     //Dice type that has already been selected
     const [selectedPoints, setSelectedPoints] = 
@@ -44,38 +45,48 @@ export default function Gameboard ({route}) {
 
 
     // Current dices on the table
-    const [currentDices, setCurrentDices] = 
-        useState(new Array(NBR_OF_DICES).fill(0))
+    const [dicesOnTable, setDicesOnTable] = 
+        useState(new Array(Constants.NBR_OF_DICES).fill(0))
 
-    // console.log("+++++++", currentDices)
-
-    // const [points1, setPoints1] = useState(0)
-    // const [points2, setPoints2] = useState(0)
-    // const [points3, setPoints3] = useState(0)
-    // const [points4, setPoints4] = useState(0)
-    // const [points5, setPoints5] = useState(0)
-    // const [points6, setPoints6] = useState(0)
+function handleGameEnd() {
+    setGameOver(false)
+    setAllowFreeze(true)
+    setNbrOfThrowsLeft(Constants.NBR_OF_THROWS)
+    setTotalPoints(0)
     
-    // setPointsPerdice(2)
 
+    setStatus("Game restarted")
+
+    setSelectedDices(new Array(Constants.NBR_OF_DICES).fill(false))
+
+    setSelectedPoints(new Array(6).fill(false))
+    setPointsPerdice(new Array(6).fill(0))
+    setDicesOnTable(new Array(Constants.NBR_OF_DICES).fill(0))
+
+    // checkBonusPoints()
+    // setStatus("The game has ended")
+    // console.log("GG")
+
+}
 
 
 function getDiceColor(i) {
-    // if (board.every((val, i, arr) => val === arr[0])) {
-    //     return "orange";
-    // }
-    // else {
+    if (board.every((val, i, arr) => val === arr[0])) {
+        return "orange";
+    }
+    else {
         return selectedDices[i] ? "black" : "steelblue";
-    // }
+    }
 }
 
 function getPointsColor(i) {
-    if (selectedPoints.every((val, i, arr) => val === arr[0]) && selectedPoints[0] == true) {
-        console.log("Peli ohi");
-    }
+    // if (selectedPoints.every((val, i, arr) => val === arr[0]) && selectedPoints[0] == true) {
+    //     console.log("Peli ohi");
+    // }
     return selectedPoints[i] ? "black" : "steelblue";
     
 }
+
 
 const selectDice = (i) => {
     if (nbrOfThrowsLeft > 0 && allowFreeze == true){
@@ -88,59 +99,62 @@ const selectDice = (i) => {
 
 const selectPoints = (i) => {
     let faceValue = i + 1
-
-    console.log(i)
+    // console.log(i)
     let pointSelection = [...selectedPoints];
 
-    // Setting points for specific dice type
 
 
-    setStatus("Throw 3 times before setting points");
+    
     if (pointSelection[i] == false && nbrOfThrowsLeft == 0) {
-        
-        console.log("okaspodaksopdkpoaskdo")
-        dicesRightNow = [...currentDices]
+        setStatus("Points set for " + faceValue)
+        dicesRightNow = [...dicesOnTable]
 
-        console.log("aaaaaaaaaaa" ,dicesRightNow)
 
         countOfSame = dicesRightNow.filter(x => x === faceValue).length
-        // console.log("mmmmm", dicesRightNow.filter(x => x === i + 1).length)
-    
-        // console.log("asd",dicesRightNow)
-        // console.log(dicesRightNow.count(i))
-        console.log(i)
-        let pointsss = [...pointsPerdice];
-        pointsss[i] = ( faceValue ) * countOfSame
-        setPointsPerdice(pointsss);
+
+        // console.log(i)
+        let pointsToAdd = [...pointsPerdice];
+        pointsToAdd[i] = ( faceValue ) * countOfSame
+        setPointsPerdice(pointsToAdd);
+        // console.log("Pojot: ", totalPoints)
         setTotalPoints(totalPoints + faceValue * countOfSame)
-        // checkBonusPoints()
+        // console.log("Pojot jalkee: ", totalPoints)
+    
         pointSelection[i] = true
-        console.log("----", pointSelection)
+
 
         setSelectedPoints(pointSelection)
 
 
-        setSelectedDices(new Array(NBR_OF_DICES).fill(false))
-        // setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
+        setSelectedDices(new Array(Constants.NBR_OF_DICES).fill(false))
+        
         setAllowFreeze(false)
-        setNbrOfThrowsLeft(NBR_OF_THROWS);
-    
+        console.log(pointSelection)
+        if (pointSelection.every((val, i, arr) => val === arr[0]) && pointSelection[0] == true) {
+            
+            // setGameOver(true)
+            // handleGameEnd()
+            setGameOver(true)
+        }
+        else{
+            setNbrOfThrowsLeft(Constants.NBR_OF_THROWS);
+
+        }
+
     } 
- 
-    // Sets the color of the button
-
-
-
-    
+    else {
+        setStatus("Throw 3 times before setting points");
+    }
 }
 
-let dicesNow  = [...currentDices]
+let dicesNow  = [...dicesOnTable]
 
 const throwDices = () => {
     setAllowFreeze(true)
     if (nbrOfThrowsLeft > 0){
         setStatus("Select and rethrow");
-        for (let i = 0; i < NBR_OF_DICES; i++){
+        // console.log("loop?")
+        for (let i = 0; i < Constants.NBR_OF_DICES; i++){
             if (!selectedDices[i]){
                 let randomNumber = Math.floor(Math.random() * 6 + 1);
                 board[i] = 'dice-' + randomNumber;
@@ -149,57 +163,46 @@ const throwDices = () => {
             } 
         }
             
-    setCurrentDices(dicesNow)
+    setDicesOnTable(dicesNow)
     setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
+
     }
     else {
         setStatus("Select points before throwing")
     }
-
 }
 
-// const checkWinner = () => {
-//     if (board.every((val, i, arr) => val === arr[0]) && nbrOfThrowsLeft > 0){
-//         setStatus("You won");
-//     }
-//     else if (board.every((val, i, arr) => val === arr[0]) && nbrOfThrowsLeft === 0){
-//         setStatus("You won, game over")
-//         setSelectedDices(new Array(NBR_OF_DICES).fill(false));
-//     }
-//     else if (nbrOfThrowsLeft === 0) {
-//         setStatus("Game over")
-//         setSelectedDices(new Array(NBR_OF_DICES).fill(false));
-//     }
-//     else {
-//         setStatus('Keep on throwing');
-//     }
-// }
+function checkBonusPoints() {
+    let pojot = totalPoints
+    console.log("Totaaliset pointsi:", pojot)
+    console.log("Total points: ",totalPoints)
+    if (totalPoints > Constants.BONUS_POINTS_LIMIT){
+        setStatus("The game has ended, you were awarded " + Constants.BONUS_POINTS + " bonus points")
+        setTotalPoints(totalPoints + Constants.BONUS_POINTS)
+    }
+    else {
+        console.log("es")
+        setStatus("The game has ended, you didn't get bonus points")
 
-// const checkBonusPoints = () => {
-//     if (totalPoints > BONUS_POINTS_LIMIT){
-//         console.log("bonari!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-//         setTotalPoints(totalPoints + BONUS_POINTS)
-//     }
-//     else {
-//         console.log("es")
-//     }
-// }
+    }
+}
 
 useEffect(() => {
-    // checkBonusPoints()
-    if (nbrOfThrowsLeft === NBR_OF_THROWS) {
+    checkBonusPoints()
+    if (nbrOfThrowsLeft === Constants.NBR_OF_THROWS) {
         setStatus("Throw dices");
     }
-    if (nbrOfThrowsLeft < 0) {
-        console.log("oon täsä :DDDDDDDDDDDDDDDDDDDD")
-        setNbrOfThrowsLeft(NBR_OF_THROWS-1);
+    // if (nbrOfThrowsLeft < 0) {
+    //     console.log("oon täsä :DDDDDDDDDDDDDDDDDDDD")
+    //     setNbrOfThrowsLeft(Constants.NBR_OF_THROWS-1);
         
-    }
-}, [nbrOfThrowsLeft]);
+    // }
+}, [gameOver]);
 
 
 const row = [];
-for (let i = 0; i < NBR_OF_DICES; i++){
+
+for (let i = 0; i < Constants.NBR_OF_DICES; i++){
     row.push(
         <Pressable
             key={"row" + i}
@@ -233,10 +236,14 @@ for (let i = 0; i < 6; i++){
     );
 }
 
-
 return(
     <View style={styles.gameboard}>
-        <View style={styles.flex}>{row}</View>
+        <View style={styles.flex}>{row}
+        {/* <MaterialCommunityIcons
+            name={"dice-multiple"}
+            size={50}>
+        </MaterialCommunityIcons> */}
+        </View>
 
         <Text style={styles.gameinfo}>Throws left: {nbrOfThrowsLeft}</Text>
         <Text style={styles.gameinfo}>{status}</Text>
@@ -250,7 +257,15 @@ return(
                 </Text>
             </Pressable>
         <Text>Total Points: {totalPoints}</Text>
-        <Text>You are {BONUS_POINTS_LIMIT - totalPoints} points away from bonus!</Text>
+        <Text>
+            You are {Constants.BONUS_POINTS_LIMIT - totalPoints} points away from bonus!
+        </Text>
+        <Pressable style={styles.button}
+            onPress={() => handleGameEnd()}>
+                <Text style={styles.buttonText}>
+                    Restart
+                </Text>
+            </Pressable>
     </View>
 )
 
